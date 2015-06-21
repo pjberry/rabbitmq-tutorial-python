@@ -11,10 +11,11 @@ def callback(ch, method, properties, body):
 
 connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
 channel = connection.channel()
+channel.exchange_declare('logs', type='fanout')
 
 channel.basic_qos(prefetch_count=1)
 result = channel.queue_declare(exclusive=True)
-channel.exchange_declare('logs', type='fanout')
+channel.queue_bind('logs', queue=result.method.queue)
 
 channel.basic_consume(callback, queue='task_queue')
 
