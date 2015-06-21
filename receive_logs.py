@@ -13,7 +13,7 @@ connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
 channel = connection.channel()
 
 channel.basic_qos(prefetch_count=1)
-channel.queue_declare(queue='task_queue', durable=True)
+result = channel.queue_declare(exclusive=True)
 channel.exchange_declare('logs', type='fanout')
 
 channel.basic_consume(callback, queue='task_queue')
