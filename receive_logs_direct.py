@@ -9,12 +9,13 @@ def callback(ch, method, properties, body):
 connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
 channel = connection.channel()
 
-channel.exchange_declare(exchange='logs', type='fanout')
+channel.exchange_declare(exchange='direct_logs', type='fanout')
 
 result = channel.queue_declare(exclusive=True)
 queue_name = result.method.queue
 
-channel.queue_bind(exchange='logs', queue=queue_name)
+for severity in severities:
+    channel.queue_bind(exchange='direct_logs', queue=queue_name, routing_key=severity)
 
 print ' [*] Waiting for messages. To exit, press CTRL+C'
 
